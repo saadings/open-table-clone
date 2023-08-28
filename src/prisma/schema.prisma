@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// q: how to use co-pilot chat
+// a: 
+
+enum Price {
+  CHEAP
+  REGULAR
+  EXPENSIVE
+}
+
+// Model definitions
+model Restaurant {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  mainImage   String
+  images      String[]
+  openTime    String
+  closeTime   String
+  slug        String   @unique
+  price       Price
+  locationId  String
+  location    Location @relation(fields: [locationId], references: [id])
+  cuisineId   String
+  cuisine     Cuisine  @relation(fields: [cuisineId], references: [id])
+  items       Item[]
+  reviews     Review[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Location {
+  id          String       @id @default(uuid())
+  name        String
+  restaurants Restaurant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Item {
+  id           String     @id @default(uuid())
+  name         String
+  price        String
+  description  String
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Cuisine {
+  id          String       @id @default(uuid())
+  name        String
+  restaurants Restaurant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id        String     @id @default(uuid())
+  firstName String
+  lastName  String
+  city      String
+  email     String     @unique
+  password  String
+  phone    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reviews   Review[]
+}
+
+model Review {
+  id        String     @id @default(uuid())
+  firstName String
+  lastName  String
+  text      String
+  rating    Float
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
